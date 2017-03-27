@@ -259,7 +259,12 @@ class Sentiment {
 	public function setDataFolder($dataFolder = false, $lang = 'en', $loadDefaults = false){
 		//if $dataFolder not provided, load default, else set the provided one
 		if($dataFolder == false){
-			$this->dataFolder = __DIR__ . '/data/' . $lang .'/';
+			if (file_exists(__DIR__ . '/data/' . $lang .'/')) {
+				$this->dataFolder = __DIR__ . '/data/' . $lang .'/';
+			} else {
+				echo 'Error: could not find the directory - '. __DIR__ . '/data/' . $lang .'/';
+			}
+
 		}
 		else{
 			if(file_exists($dataFolder)){
