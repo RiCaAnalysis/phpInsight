@@ -114,10 +114,10 @@ class Sentiment {
 	 * @param str $dataFolder base folder
 	 * Sets defaults and loads/caches dictionaries
 	 */
-	public function __construct($dataFolder = false) {
+	public function __construct($dataFolder = false, $lang = 'en') {
 
 		//set the base folder for the data models
-		$this->setDataFolder($dataFolder);
+		$this->setDataFolder($dataFolder, $lang);
 
 		//load and cache directories, get ignore and prefix lists
 		$this->loadDefaults();
@@ -287,10 +287,15 @@ class Sentiment {
 	 * @param str  $dataFolder base folder
 	 * @param bool $loadDefaults true - load everything by default | false - just change the directory
 	 */
-	public function setDataFolder($dataFolder = false, $loadDefaults = false){
+	public function setDataFolder($dataFolder = false, $lang = 'en', $loadDefaults = false){
 		//if $dataFolder not provided, load default, else set the provided one
 		if($dataFolder == false){
-			$this->dataFolder = __DIR__ . '/data/';
+			if (file_exists(__DIR__ . '/data/' . $lang .'/')) {
+				$this->dataFolder = __DIR__ . '/data/' . $lang .'/';
+			} else {
+				echo 'Error: could not find the directory - '. __DIR__ . '/data/' . $lang .'/';
+			}
+
 		}
 		else{
 			if(file_exists($dataFolder)){
