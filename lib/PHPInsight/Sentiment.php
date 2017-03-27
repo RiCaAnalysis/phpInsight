@@ -67,6 +67,16 @@ class Sentiment {
 	 */
 	private $classes = array('pos', 'neg', 'neu');
 
+    /**
+     * Classes equivalent for inverse
+     * @var array
+     */
+    private $inverseClasses = array(
+        'pos' => 'neg',
+        'neg' => 'pos',
+        'neu' => 'ign',
+    );
+
 	/**
 	 * Token score per class
 	 * @var array 
@@ -134,16 +144,41 @@ class Sentiment {
         //Protect to conserve possible special chars
         $token = str_replace('*', '([.*])', preg_quote($token, '#'));
 
-        //Try to match using the regex for each word of dictionary
+        //Get list of dictionary words
         $dictionary_tokens = array_keys($this->dictionary);
 
+        //Try to match using the regex for each word of dictionary
         foreach ($dictionary_tokens as $dictionary_token) {
             $matches = array();
 
-            preg_match('#' . $token . '#u', $dictionary_token, $matches);
+            preg_match('#^' . $token . '$#u', $dictionary_token, $matches);
 
             if ($matches !== FALSE) {
                 return $matches[0];
+            }
+        }
+
+        return false;
+    }
+
+    
+    /**
+     * Search a token into the negPrefixList
+     *
+     * @param str $token
+     * @return boolean : true if found, false else
+     */
+    public function searchTokenInNegPrefixList($token) {
+
+        //Protect to conserve possible special chars
+        $token = str_replace('*', '([.*])', preg_quote($token, '#'));
+
+        //Try to match using regex for each prefix of the list
+        foreach ($negPrefixList as $negPrefix) {
+            $matches = array();
+
+            if (preg_match('#^' . $token . '$#u', $negPrefix, $matches) !== FALSE) {
+                return true;
             }
         }
 
@@ -158,15 +193,6 @@ class Sentiment {
 	 */
 	public function score($sentence) {
 
-       	//For each negative prefix in the list
-		foreach ($this->negPrefixList as $negPrefix) {
-			//Search if that prefix is in the document
-			if (strpos($sentence, $negPrefix) !== false) {
-				//Reove the white space after the negative prefix
-				$sentence = str_replace($negPrefix . ' ', $negPrefix, $sentence);
-			}
-		}
-
 		//Tokenise Document
 		$tokens = $this->_getTokens($sentence);
 		// calculate the score in each category
@@ -174,31 +200,43 @@ class Sentiment {
 		$total_score = 0;
 
 		//Empty array for the scores for each of the possible categories
-		$scores = array();
+        $scores = array();
+
+        //Loop to initialize scores[$class] for each $class
+        foreach ($this->classes as $class) {
+			$scores[$class] = 1;
+        }
 
 		//Loop through all of the different classes set in the $classes variable
 		foreach ($this->classes as $class) {
 
-			//In the scores array add another dimention for the class and set it's value to 1. EG $scores->neg->1
-			$scores[$class] = 1;
-
 			//For each of the individual words used loop through to see if they match anything in the $dictionary
-			foreach ($tokens as $token) {
+			foreach ($tokens as $token_key => $token) {
 
 				//If statement so to ignore tokens which are either too long or too short or in the $ignoreList
                 if (strlen($token) < $this->minTokenLength || strlen($token) > $this->maxTokenLength || in_array($token, $this->ignoreList)) {
                     continue;
                 }
-                
-                //If there is such a word in dictionary[token][class]
+
+                //If there is no such a word in dictionary for current class, go to next word
                 $token_found = $this->searchTokenInDictionary($token);
 
-                $count = 0;
+                if ($token_found === FALSE || !isset($this->dictionary[$token_found][$class])) {
+                    continue;
+                }
+                
+                //Set count equal to it
+                $count = $this->dictionary[$token_found][$class];
 
-                if ($token_found !== FALSE && isset($this->dictionary[$token_found][$class]))
-                {
-                    //Set count equal to it
-                    $count = $this->dictionary[$token_found][$class];
+                //Else, we are going to check for prefix that should inverse meaning
+                if (isset($tokens[$token_key - 1]) && $this->searchTokenInNegPrefixList($tokens[$token_key - 1])) {
+                    
+                    //If we found one, we are going to improve the score of the inverse "class" if it exist
+                    if (isset($scores[$this->inverseClasses[$class]])) {
+                        $scores[$this->inverseClasses[$class]] *= ($count + 1);
+                    } //Else, we simply ignore the token
+
+                    continue;
                 }
 
                 //Score[class] is calcumeted by $scores[class] x $count +1 divided by the $classTokCounts[class] + $tokCount
