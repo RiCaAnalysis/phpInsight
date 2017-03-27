@@ -121,7 +121,34 @@ class Sentiment {
 
 		//load and cache directories, get ignore and prefix lists
 		$this->loadDefaults();
-	}
+    }
+
+    /**
+     * Search a token into the dictionary, supportingt wildcare
+     *
+     * @param str $token
+     * @return mixed : false if not found, else, the word
+     */
+    public function searchTokenInDictionary($token) {
+
+        //Protect to conserve possible special chars
+        $token = str_replace('*', '([.*])', preg_quote($token, '#'));
+
+        //Try to match using the regex for each word of dictionary
+        $dictionary_tokens = array_keys($this->dictionary);
+
+        foreach ($dictionary_tokens as $dictionary_token) {
+            $matches = array();
+
+            preg_match('#' . $token . '#u', $dictionary_token, $matches);
+
+            if ($matches !== FALSE) {
+                return $matches[0];
+            }
+        }
+
+        return false;
+    }
 
 	/**
 	 * Get scores for each class
@@ -131,9 +158,8 @@ class Sentiment {
 	 */
 	public function score($sentence) {
 
-		//For each negative prefix in the list
+       	//For each negative prefix in the list
 		foreach ($this->negPrefixList as $negPrefix) {
-
 			//Search if that prefix is in the document
 			if (strpos($sentence, $negPrefix) !== false) {
 				//Reove the white space after the negative prefix
@@ -160,18 +186,23 @@ class Sentiment {
 			foreach ($tokens as $token) {
 
 				//If statement so to ignore tokens which are either too long or too short or in the $ignoreList
-				if (strlen($token) > $this->minTokenLength && strlen($token) < $this->maxTokenLength && !in_array($token, $this->ignoreList)) {
-					//If dictionary[token][class] is set
-					if (isset($this->dictionary[$token][$class])) {
-						//Set count equal to it
-						$count = $this->dictionary[$token][$class];
-					} else {
-						$count = 0;
-					}
+                if (strlen($token) < $this->minTokenLength || strlen($token) > $this->maxTokenLength || in_array($token, $this->ignoreList)) {
+                    continue;
+                }
+                
+                //If there is such a word in dictionary[token][class]
+                $token_found = $this->searchTokenInDictionary($token);
 
-					//Score[class] is calcumeted by $scores[class] x $count +1 divided by the $classTokCounts[class] + $tokCount
-					$scores[$class] *= ($count + 1);
-				}
+                $count = 0;
+
+                if ($token_found !== FALSE && isset($this->dictionary[$token_found][$class]))
+                {
+                    //Set count equal to it
+                    $count = $this->dictionary[$token_found][$class];
+                }
+
+                //Score[class] is calcumeted by $scores[class] x $count +1 divided by the $classTokCounts[class] + $tokCount
+                $scores[$class] *= ($count + 1);
 			}
 
 			//Score for this class is the prior probability multiplyied by the score for this class
