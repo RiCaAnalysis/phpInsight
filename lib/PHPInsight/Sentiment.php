@@ -41,7 +41,13 @@ class Sentiment {
 	 * List of words with negative prefixes, e.g. isn't, arent't
 	 * @var array
 	 */
-	private $negPrefixList = array();
+    private $negPrefixList = array();
+
+    /**
+     * List of words thats supposed to split expression, e.g ':', ',', '.', ';'
+     * @var array
+     */
+    private $splitWordsList = array();
 
 	/**
 	 * Storage of cached dictionaries
@@ -190,7 +196,6 @@ class Sentiment {
 	 * @return int Score
 	 */
 	public function score($sentence) {
-
 		//Tokenise Document
 		$tokens = $this->_getTokens($sentence);
 		// calculate the score in each category
@@ -228,7 +233,7 @@ class Sentiment {
 
                 //Else, we are going to check for prefix that should inverse meaning
                 if (isset($tokens[$token_key - 1]) && $this->searchTokenInNegPrefixList($tokens[$token_key - 1])) {
-
+                    
                     //If we found one, we are going to improve the score of the inverse "class" if it exist
                     if (isset($scores[$this->inverseClasses[$class]])) {
                         $scores[$this->inverseClasses[$class]] *= ($count + 1);
@@ -374,7 +379,14 @@ class Sentiment {
 
 		//If neg prefix list not set give error
 		if (!isset($this->negPrefixList))
-			echo 'Error: Ignore List not set';
+            echo 'Error: Negative Prefix List not set';
+
+        //Get the list of split words
+        $this->splitWordsList = $this->getList('split');
+
+        //If split words list not set give error
+		if (!isset($this->splitWordsList))
+            echo 'Error: Split Word List not set';
 	}
 
 	/**
@@ -386,7 +398,15 @@ class Sentiment {
 	private function _getTokens($string) {
 
 		// Replace line endings with spaces
-		$string = str_replace("\r\n", " ", $string);
+        $string = str_replace("\r\n", " ", $string);
+
+        $splitWordsListWithSpaces = $this->splitWordsList;
+
+        foreach ($splitWordsListWithSpaces as $key => $value) {
+            $splitWordsListWithSpaces[$key] = ' ' . $value . ' ';
+        }
+
+        $string = str_replace($this->splitWordsList, $splitWordsListWithSpaces, $string);
 
 		//Clean the string so is free from accents
 		$string = $this->_cleanString($string);
@@ -395,7 +415,10 @@ class Sentiment {
 		$string = strtolower($string);
 
 		//Break string into individual words using explode putting them into an array
-		$matches = explode(" ", $string);
+        $matches = explode(" ", $string);
+
+        //Remove empty strings from $matches and reindex
+        $matches = array_values(array_filter($matches, function($value) { return !($value == ""); }));
 
 		//Return array with each individual token
 		return $matches;
