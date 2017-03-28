@@ -232,15 +232,52 @@ class Sentiment {
                 $count = $this->dictionary[$token_found][$class];
 
                 //Else, we are going to check for prefix that should inverse meaning
-                if (isset($tokens[$token_key - 1]) && $this->searchTokenInNegPrefixList($tokens[$token_key - 1])) {
+                
+                /*
+                    Note : Here, we are using what i call "Forward-back journey", wich is a way to search before (and potentialy after, but, for now, just before) the current token, for finding a potential meaning modifier. This method take in consideration the "split words", and potentials meaningful words.
+                */
+
+                $found_negative_prefix = false;
+                $i = 0;
+                while (!$found_negative_prefix) {
                     
-                    //If we found one, we are going to improve the score of the inverse "class" if it exist
+                    //Go for previous word
+                    $i++;
+                    
+                    //If we reach an end of the text, breaking the loop
+                    if (!isset($tokens[$token_key - $i])) {
+                        break;
+                    }
+                    
+                    //If we found a split character, then its another part of the sentence, so we break the loop too
+                    if (in_array($tokens[$token_key - $i], $this->splitWordsList)) {
+                        break;
+                    }
+
+                    //If we found a token that have meaning for us, then previous negative prefix is for him, so, break the loop again
+                    if ($this->searchTokenInDictionary($tokens[$token_key - $i])) {
+                        break;
+                    }
+
+                    //So, if we found a negative prefix in this part of this sentence, for this particular token, then, we can consider that we found a meaningful prefix
+                    if ($this->searchTokenInNegPrefixList($tokens[$token_key - $i])) {
+                        $found_negative_prefix = true;
+                    }
+                }
+
+                //If we found a negative prefix for this token
+                if ($found_negative_prefix) {
+                    
+                    //If there is an inverse class for the current one, we improve his score instead
                     if (isset($scores[$this->inverseClasses[$class]])) {
                         $scores[$this->inverseClasses[$class]] *= ($count + 1);
                     } //Else, we simply ignore the token
 
                     continue;
+                    
                 }
+
+                //If we do not found a negative prefix, increment score as regular
 
                 //Score[class] is calcumeted by $scores[class] x $count +1 divided by the $classTokCounts[class] + $tokCount
                 $scores[$class] *= ($count + 1);
