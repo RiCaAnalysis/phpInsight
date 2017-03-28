@@ -172,7 +172,7 @@ class Sentiment {
         $token = str_replace('*', '([.*])', preg_quote($token, '#'));
 
         //Try to match using regex for each prefix of the list
-        foreach ($negPrefixList as $negPrefix) {
+        foreach ($this->negPrefixList as $negPrefix) {
             $matches = array();
 
             if (preg_match('#^' . $token . '$#u', $negPrefix, $matches) !== 0) {
