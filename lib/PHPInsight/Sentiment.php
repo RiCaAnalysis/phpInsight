@@ -151,9 +151,7 @@ class Sentiment {
         foreach ($dictionary_tokens as $dictionary_token) {
             $matches = array();
 
-            preg_match('#^' . $token . '$#u', $dictionary_token, $matches);
-
-            if ($matches !== FALSE) {
+            if (preg_match('#^' . $token . '$#u', $dictionary_token, $matches) !== 0) {
                 return $matches[0];
             }
         }
@@ -177,7 +175,7 @@ class Sentiment {
         foreach ($negPrefixList as $negPrefix) {
             $matches = array();
 
-            if (preg_match('#^' . $token . '$#u', $negPrefix, $matches) !== FALSE) {
+            if (preg_match('#^' . $token . '$#u', $negPrefix, $matches) !== 0) {
                 return true;
             }
         }
@@ -211,7 +209,7 @@ class Sentiment {
 		foreach ($this->classes as $class) {
 
 			//For each of the individual words used loop through to see if they match anything in the $dictionary
-			foreach ($tokens as $token_key => $token) {
+            foreach ($tokens as $token_key => $token) {
 
 				//If statement so to ignore tokens which are either too long or too short or in the $ignoreList
                 if (strlen($token) < $this->minTokenLength || strlen($token) > $this->maxTokenLength || in_array($token, $this->ignoreList)) {
@@ -224,13 +222,13 @@ class Sentiment {
                 if ($token_found === FALSE || !isset($this->dictionary[$token_found][$class])) {
                     continue;
                 }
-                
+
                 //Set count equal to it
                 $count = $this->dictionary[$token_found][$class];
 
                 //Else, we are going to check for prefix that should inverse meaning
                 if (isset($tokens[$token_key - 1]) && $this->searchTokenInNegPrefixList($tokens[$token_key - 1])) {
-                    
+
                     //If we found one, we are going to improve the score of the inverse "class" if it exist
                     if (isset($scores[$this->inverseClasses[$class]])) {
                         $scores[$this->inverseClasses[$class]] *= ($count + 1);
