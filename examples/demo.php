@@ -11,6 +11,8 @@ $strings = array(
 	5 => 'She is seemingly very agressive',
 	6 => 'Marie was enthusiastic about the upcoming trip. Her brother was also passionate about her leaving - he would finally have the house for himself.',
 	7 => 'To be or not to be?',
+    8 => 'It\'s not a beautiful day today.',
+    9 => 'This day is not beautiful.',
 );
 
 
