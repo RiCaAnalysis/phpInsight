@@ -454,20 +454,17 @@ class Sentiment {
 
 		// Replace line endings with spaces
         $string = str_replace("\r\n", " ", $string);
-
-        $splitWordsListWithSpaces = $this->splitWordsList;
-
-        foreach ($splitWordsListWithSpaces as $key => $value) {
-            $splitWordsListWithSpaces[$key] = ' ' . $value . ' ';
-        }
-
-        $string = str_replace($this->splitWordsList, $splitWordsListWithSpaces, $string);
-
-		//Clean the string so is free from accents
+        
+        //Clean the string so is free from accents
 		$string = $this->_cleanString($string);
 
 		//Make all texts lowercase as the database of words in in lowercase
 		$string = strtolower($string);
+
+        //Separe split word from real ones
+        foreach ($this->splitWordsList as $key => $value) {
+            $string = mb_ereg_replace('([a-zA-Z])(' . preg_quote($value) . ')( )?', '\\1 \\2\\3', $string);
+        }
 
 		//Break string into individual words using explode putting them into an array
         $matches = explode(" ", $string);

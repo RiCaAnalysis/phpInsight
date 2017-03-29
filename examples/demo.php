@@ -15,6 +15,9 @@ $strings = array(
     9 => 'This day is not beautiful.',
     10 => 'I think they lose not, for now at least.',
     11 => 'She is beautiful not?',
+    12 => 'This guy :)',
+    13 => 'This guy :(',
+    14 => 'This is amazing for one reason: No side effects !', 
 );
 
 
