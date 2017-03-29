@@ -13,6 +13,8 @@ $strings = array(
 	7 => 'To be or not to be?',
     8 => 'It\'s not a beautiful day today.',
     9 => 'This day is not beautiful.',
+    10 => 'I think they lose not, for now at least.',
+    11 => 'She is beautiful not?',
 );
 
 

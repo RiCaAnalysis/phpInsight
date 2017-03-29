@@ -221,12 +221,13 @@ class Sentiment {
                     continue;
                 }
 
-                //If there is no such a word in dictionary for current class, go to next word
+                //Search for current token in dictionaries
                 $token_found = $this->searchTokenInDictionary($token);
 
+                //If there is not for the current class, pass to next token
                 if ($token_found === FALSE || !isset($this->dictionary[$token_found][$class])) {
                     continue;
-                }
+                } //Else, let's go for processing
 
                 //Set count equal to it
                 $count = $this->dictionary[$token_found][$class];
@@ -238,29 +239,41 @@ class Sentiment {
                 */
 
                 $found_negative_prefix = false;
+                $continue_search_forward = true;
+                $continue_search_backward = true;
                 $i = 0;
-                while (!$found_negative_prefix) {
-                    
+                while (!$found_negative_prefix && ($continue_search_backward || $continue_search_forward)) {
+
                     //Go for previous word
                     $i++;
+
+                    //Set backward and forward tokens, if they exists
+                    $forward_token = isset($tokens[$token_key + $i]) ? $tokens[$token_key + $i] : false;
+                    $backward_token = isset($tokens[$token_key - $i]) ? $tokens[$token_key - $i] : false;
                     
-                    //If we reach an end of the text, breaking the loop
-                    if (!isset($tokens[$token_key - $i])) {
-                        break;
-                    }
-                    
-                    //If we found a split character, then its another part of the sentence, so we break the loop too
-                    if (in_array($tokens[$token_key - $i], $this->splitWordsList)) {
-                        break;
+                    //If we reach end of the text, or find a split word after current token, or another meaningful token, then, stop looking forward
+                    if (!$forward_token || in_array($forward_token, $this->splitWordsList) || $this->searchTokenInDictionary($forward_token)) {
+                        $continue_search_forward = false;
                     }
 
-                    //If we found a token that have meaning for us, then previous negative prefix is for him, so, break the loop again
-                    if ($this->searchTokenInDictionary($tokens[$token_key - $i])) {
-                        break;
+                    //If we reach begenning of the text, or find a split word before current token, or another meaningful token, then stop looking backward
+                    if (!$backward_token || in_array($backward_token, $this->splitWordsList) || $this->searchTokenInDictionary($backward_token)) {
+                        $continue_search_backward = false;
                     }
 
-                    //So, if we found a negative prefix in this part of this sentence, for this particular token, then, we can consider that we found a meaningful prefix
-                    if ($this->searchTokenInNegPrefixList($tokens[$token_key - $i])) {
+                    //If we found a negative prefix in this part of the sentence, we can consider it as meaningful
+            
+                    if ($this->searchTokenInNegPrefixList($forward_token)) {
+                        $found_negative_prefix = true;
+                    
+                        //For forward token only, take count of potential interogation mark after.
+                        //In case of, interrogation mark, dont apply negative prefix
+                        if (isset($tokens[$token_key + $i + 1]) && $tokens[$token_key + $i + 1] == '?') {
+                            $found_negative_prefix = false;
+                        }
+                    }
+ 
+                    if ($this->searchTokenInNegPrefixList($backward_token)) {
                         $found_negative_prefix = true;
                     }
                 }
@@ -311,6 +324,11 @@ class Sentiment {
 	public function categorise($sentence) {
 
 		$scores = $this->score($sentence);
+
+        //If all scores are equal return 'neu', wich reflect the most the truth
+        if (count(array_unique($scores)) === 1) {
+            return 'neu';
+        }
 
 		//Classification is the key to the scores array
 		$classification = key($scores);
