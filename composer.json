@@ -1,5 +1,5 @@
 {
-	  "name": "Misterbura/phpinsight",
+	  "name": "Misterbural/phpinsight",
     "type": "library",
     "description": "Sentiment analysis tool for PHP",
     "keywords": ["sentiment", "insight", "phpinsight"],
