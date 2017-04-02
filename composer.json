@@ -1,5 +1,5 @@
 {
-	  "name": "jwhennessey/phpinsight",
+	  "name": "Misterbura/phpinsight",
     "type": "library",
     "description": "Sentiment analysis tool for PHP",
     "keywords": ["sentiment", "insight", "phpinsight"],
