@@ -325,8 +325,8 @@ class Sentiment {
 
 		$scores = $this->score($sentence);
 
-        //If all scores are equal return 'neu', wich reflect the most the truth
-        if (count(array_unique($scores)) === 1) {
+        //If no clear score, return 'neu'
+        if ($scores[0] == $scores[1]) {
             return 'neu';
         }
 
