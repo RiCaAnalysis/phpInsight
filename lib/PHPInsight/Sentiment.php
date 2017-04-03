@@ -326,7 +326,7 @@ class Sentiment {
 		$scores = $this->score($sentence);
 
         //If no clear score, return 'neu'
-        if ($scores[0] == $scores[1]) {
+        if ($scores[array_keys($scores)[0]] == $scores[array_keys($scores)[1]]) {
             return 'neu';
         }
 
