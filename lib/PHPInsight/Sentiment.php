@@ -157,7 +157,7 @@ class Sentiment {
         foreach ($dictionary_tokens as $dictionary_token) {
             $matches = array();
 
-            if (preg_match('#^' . $token . '$#u', $dictionary_token, $matches) !== 0) {
+            if (preg_match('#^' . preg_quote($token) . '$#u', $dictionary_token, $matches) !== 0) {
                 return $matches[0];
             }
         }
@@ -181,7 +181,7 @@ class Sentiment {
         foreach ($this->negPrefixList as $negPrefix) {
             $matches = array();
 
-            if (preg_match('#^' . $token . '$#u', $negPrefix, $matches) !== 0) {
+            if (preg_match('#^' . preg_quote($token) . '$#u', $negPrefix, $matches) !== 0) {
                 return true;
             }
         }
