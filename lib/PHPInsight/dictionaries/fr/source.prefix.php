@@ -1,5 +1,7 @@
 <?php
 $prefix = array(
   'pas',
-  'ne'
+  'ne',
+  'n',
+  'non',
 );

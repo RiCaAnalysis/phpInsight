@@ -467,7 +467,7 @@ class Sentiment {
         }
 
 		//Break string into individual words using explode putting them into an array
-        $matches = explode(" ", $string);
+        $matches = mb_split("( |')", $string);
 
         //Remove empty strings from $matches and reindex
         $matches = array_values(array_filter($matches, function($value) { return !($value == ""); }));
