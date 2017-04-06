@@ -552,8 +552,7 @@ $pos = array(
   "facilite*", 
   "facilite*", 
   "factuel*", 
-  "faillible", 
-  "faire les manchettes", 
+  "faillible",
   "faisable", 
   "fameu*", 
   "familiarite*", 
@@ -923,7 +922,6 @@ $pos = array(
   "piete*", 
   "pieux", 
   "pittoresque", 
-  "placide", 
   "plaisant*", 
   "plaisante*", 
   "plaisantrie*", 
@@ -1294,7 +1292,7 @@ $pos = array(
   "venere*", 
   "verit*", 
   "veritable*", 
-  "verite* )", 
+  "verite*", 
   "vers l'avant", 
   "vertu", 
   "vertueu*", 
@@ -1326,5 +1324,20 @@ $pos = array(
   "vrai*", 
   "zele", 
   "zele*", 
-  "zeste", 
+  "zeste",
+  'IRRÉSISTI*'
+'ADHÉ*'
+'ACQUITT*'
+'INADMISSIBLE*'
+'ATTIR*'
+'BÉNÉFIC*'
+'FONCTIONNE'
+'INNOCENT*'
+'FORCE*'
+'LÉGITIM*'
+'NUL*'
+'PERMI*'
+'CONFORM*'
+'NORMAL*'
+'CROI*'
 );
