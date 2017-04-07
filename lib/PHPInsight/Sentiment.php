@@ -142,13 +142,25 @@ class Sentiment {
     /**
      * Search a token into the dictionary, supportingt wildcare
      *
-     * @param str $token
+     * @param str $token : The token to search for in dictionnary
+     * @param mixed $class : Default = false -> search for all class, else, the class to search for ('neu', 'neg', 'pos')
      * @return mixed : false if not found, else, the word
      */
-    public function searchTokenInDictionary($token) {
+    public function searchTokenInDictionary($token, $class = false) {
 
+        var_dump($token);
+        $dictionary_tokens = [];
+            
         //Get list of dictionary words
-        $dictionary_tokens = array_keys($this->dictionary);
+        if (!$class) {
+            $dictionary_tokens = array_keys($this->dictionary);
+        } else {
+            foreach ($this->dictionary as $word => $content) {
+                if (isset($this->dictionary[$word][$class])) {
+                    $dictionary_tokens[] = $word;
+                }
+            }
+        }
 
         //Try to match using the regex for each word of dictionary
         foreach ($dictionary_tokens as $dictionary_token) {
@@ -219,14 +231,15 @@ class Sentiment {
 			//For each of the individual words used loop through to see if they match anything in the $dictionary
             foreach ($tokens as $token_key => $token) {
 
-				//If statement so to ignore tokens which are either too long or too short or in the $ignoreList
+                //If statement so to ignore tokens which are either too long or too short or in the $ignoreList
                 if (strlen($token) < $this->minTokenLength || strlen($token) > $this->maxTokenLength || in_array($token, $this->ignoreList)) {
                     continue;
                 }
 
                 //Search for current token in dictionaries
-                $token_found = $this->searchTokenInDictionary($token);
+                $token_found = $this->searchTokenInDictionary($token, $class);
 
+                var_dump($token_found);
 
                 //If there is not for the current class, pass to next token
                 if ($token_found === FALSE || !isset($this->dictionary[$token_found][$class])) {
