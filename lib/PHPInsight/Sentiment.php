@@ -220,7 +220,7 @@ class Sentiment {
             foreach ($tokens as $token_key => $token) {
 
 				//If statement so to ignore tokens which are either too long or too short or in the $ignoreList
-                if (strlen($token) < $this->minTokenLength || strlen($token) > $this->maxTokenLength){// || in_array($token, $this->ignoreList)) {
+                if (strlen($token) < $this->minTokenLength || strlen($token) > $this->maxTokenLength) || in_array($token, $this->ignoreList)) {
                     continue;
                 }
 
