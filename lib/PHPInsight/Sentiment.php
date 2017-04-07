@@ -148,7 +148,6 @@ class Sentiment {
      */
     public function searchTokenInDictionary($token, $class = false) {
 
-        var_dump($token);
         $dictionary_tokens = [];
             
         //Get list of dictionary words
@@ -238,8 +237,6 @@ class Sentiment {
 
                 //Search for current token in dictionaries
                 $token_found = $this->searchTokenInDictionary($token, $class);
-
-                var_dump($token_found);
 
                 //If there is not for the current class, pass to next token
                 if ($token_found === FALSE || !isset($this->dictionary[$token_found][$class])) {
