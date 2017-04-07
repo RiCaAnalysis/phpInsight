@@ -147,18 +147,20 @@ class Sentiment {
      */
     public function searchTokenInDictionary($token) {
 
-        //Protect to conserve possible special chars
-        $token = str_replace('*', '([.*])', preg_quote($token, '#'));
-
         //Get list of dictionary words
         $dictionary_tokens = array_keys($this->dictionary);
 
         //Try to match using the regex for each word of dictionary
         foreach ($dictionary_tokens as $dictionary_token) {
+
+            //Protect to conserve possible special chars
+            $dictionary_token_escape = str_replace('\\*', '(.*)', preg_quote($dictionary_token, '#'));
+
             $matches = array();
 
-            if (preg_match('#^' . preg_quote($token, '#') . '$#u', $dictionary_token, $matches) !== 0) {
-                return $matches[0];
+            //If match, return the token
+            if (preg_match('#^' . $dictionary_token_escape . '$#u', $token, $matches) !== 0) {
+                return $dictionary_token;
             }
         }
 
@@ -174,14 +176,15 @@ class Sentiment {
      */
     public function searchTokenInNegPrefixList($token) {
 
-        //Protect to conserve possible special chars
-        $token = str_replace('*', '([.*])', preg_quote($token, '#'));
-
         //Try to match using regex for each prefix of the list
         foreach ($this->negPrefixList as $negPrefix) {
+            
+            //Protect to conserve possible special chars
+            $negPrefixEscape = str_replace('\\*', '(.*)', preg_quote($negPrefix, '#'));
+            
             $matches = array();
 
-            if (preg_match('#^' . preg_quote($token, '#') . '$#u', $negPrefix, $matches) !== 0) {
+            if (preg_match('#^' . $negPrefixEscape . '$#u', $token, $matches) !== 0) {
                 return true;
             }
         }
@@ -217,12 +220,13 @@ class Sentiment {
             foreach ($tokens as $token_key => $token) {
 
 				//If statement so to ignore tokens which are either too long or too short or in the $ignoreList
-                if (strlen($token) < $this->minTokenLength || strlen($token) > $this->maxTokenLength || in_array($token, $this->ignoreList)) {
+                if (strlen($token) < $this->minTokenLength || strlen($token) > $this->maxTokenLength){// || in_array($token, $this->ignoreList)) {
                     continue;
                 }
 
                 //Search for current token in dictionaries
                 $token_found = $this->searchTokenInDictionary($token);
+
 
                 //If there is not for the current class, pass to next token
                 if ($token_found === FALSE || !isset($this->dictionary[$token_found][$class])) {
