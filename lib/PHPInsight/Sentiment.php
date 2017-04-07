@@ -148,40 +148,40 @@ class Sentiment {
      */
     public function searchTokenInDictionary($token, $class = false) {
 
-        $dictionary_tokens = [];
+        $words = [];
             
         //Get list of dictionary words
         if (!$class) {
-            $dictionary_tokens = array_keys($this->dictionary);
+            $words = array_keys($this->dictionary);
         } else {
-            foreach ($this->dictionary as $word => $content) {
+            foreach ($this->dictionary as $word => $wordClasses) {
                 if (isset($this->dictionary[$word][$class])) {
-                    $dictionary_tokens[] = $word;
+                    $words[] = $word;
                 }
             }
         }
 
         //Try to match using str_pos and wildcare for each word of dictionary
-        foreach ($dictionary_tokens as $dictionary_token) {
+        foreach ($words as $word) {
 
             //Search for a wildare
             $wildcare = false;
-            if (mb_strpos($dictionary_token, '*') !== false) {
-                $dictionary_token_escape = str_replace('*', '', $dictionary_token);
+            if (mb_strpos($word, '*') !== false) {
+                $word_escape = str_replace('*', '', $word);
                 $wildcare = true;
             }
 
             //If wildcare, search for a string starting by
             if ($wildcare) {
-                $stringPos = mb_strpos($token, $dictionary_token_escape);
+                $stringPos = mb_strpos($token, $word_escape);
                 if ($stringPos !== false && $stringPos == 0) {
-                    return $dictionary_token;
+                    return $word;
                 }
             }
 
             //if no wildcare, search for exact string
-            if ($token == $dictionary_token) {
-                return $dictionary_token;
+            if ($word == $token) {
+                return $word;
             }
         }
 
