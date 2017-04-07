@@ -161,16 +161,26 @@ class Sentiment {
             }
         }
 
-        //Try to match using the regex for each word of dictionary
+        //Try to match using str_pos and wildcare for each word of dictionary
         foreach ($dictionary_tokens as $dictionary_token) {
 
-            //Protect to conserve possible special chars
-            $dictionary_token_escape = str_replace('\\*', '(.*)', preg_quote($dictionary_token, '#'));
+            //Search for a wildare
+            $wildcare = false;
+            if (mb_strpos($dictionary_token, '*') !== false) {
+                $dictionary_token_escape = str_replace('*', '', $dictionary_token);
+                $wildcare = true;
+            }
 
-            $matches = array();
+            //If wildcare, search for a string starting by
+            if ($wildcare) {
+                $stringPos = mb_strpos($token, $dictionary_token_escape);
+                if ($stringPos !== false && $stringPos == 0) {
+                    return $dictionary_token;
+                }
+            }
 
-            //If match, return the token
-            if (preg_match('#^' . $dictionary_token_escape . '$#u', $token, $matches) !== 0) {
+            //if no wildcare, search for exact string
+            if ($token == $dictionary_token) {
                 return $dictionary_token;
             }
         }
@@ -187,15 +197,26 @@ class Sentiment {
      */
     public function searchTokenInNegPrefixList($token) {
 
-        //Try to match using regex for each prefix of the list
+        //Try to match using str_pos and wildcare for each prefix of the list
         foreach ($this->negPrefixList as $negPrefix) {
-            
-            //Protect to conserve possible special chars
-            $negPrefixEscape = str_replace('\\*', '(.*)', preg_quote($negPrefix, '#'));
-            
-            $matches = array();
 
-            if (preg_match('#^' . $negPrefixEscape . '$#u', $token, $matches) !== 0) {
+            //Search for wildcare
+            $wildcare = false;
+            if (mb_strpos($negPrefix, '*') !== false) {
+                $negPrefixEscape = str_replace('*', '', $negPrefix);
+                $wildcare = true;
+            }
+
+            //If wildcare, searching for a word starting by prefix
+            if ($wildcare) {
+                $strPos = mb_strpos($token, $negPrefixEscape);
+                if ($strPos !== false && $strPos == 0) {
+                    return true;
+                }
+            }
+
+            //If no wildcare, searching for exact match
+            if ($negPrefix == $token) {
                 return true;
             }
         }
