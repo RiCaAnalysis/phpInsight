@@ -1,17 +1,7 @@
 <?php 
 $neu = array(
-  "(o", 
-  "*)", 
-  "8-)", 
-  ":-", 
-  ":-\\", 
-  ":-o", 
-  ":0->-<|:", 
-  ":l", 
-  ":|", 
-  ";)", 
-  ";o)", 
-  "<:}", 
+/*  ":|",
+  "oO",
   "absolue", 
   "absolument", 
   "absorbe", 
@@ -359,4 +349,4 @@ $neu = array(
   "ouais", 
   'INTERROGE*',
   'INTERROGATIO*',
-);
+ */);
