@@ -285,20 +285,20 @@ class Sentiment {
                     //Set backward and forward tokens, if they exists
                     $forward_token = isset($tokens[$token_key + $i]) ? $tokens[$token_key + $i] : false;
                     $backward_token = isset($tokens[$token_key - $i]) ? $tokens[$token_key - $i] : false;
-                    
+
                     //If we reach end of the text, or find a split word after current token, or another meaningful token, then, stop looking forward
-                    if (!$forward_token || in_array($forward_token, $this->splitWordsList) || $this->searchTokenInDictionary($forward_token)) {
+                    if (!$forward_token || !$continue_search_forward || in_array($forward_token, $this->splitWordsList) || $this->searchTokenInDictionary($forward_token)) {
                         $continue_search_forward = false;
                     }
-
+                    
                     //If we reach begenning of the text, or find a split word before current token, or another meaningful token, then stop looking backward
-                    if (!$backward_token || in_array($backward_token, $this->splitWordsList) || $this->searchTokenInDictionary($backward_token)) {
+                    if (!$backward_token || !$continue_search_backward || in_array($backward_token, $this->splitWordsList) || $this->searchTokenInDictionary($backward_token)) {
                         $continue_search_backward = false;
                     }
 
                     //If we found a negative prefix in this part of the sentence, we can consider it as meaningful
             
-                    if ($this->searchTokenInNegPrefixList($forward_token)) {
+                    if ($continue_search_forward && $this->searchTokenInNegPrefixList($forward_token)) {
                         $found_negative_prefix = true;
                     
                         //For forward token only, take count of potential interogation mark after.
@@ -308,14 +308,13 @@ class Sentiment {
                         }
                     }
  
-                    if ($this->searchTokenInNegPrefixList($backward_token)) {
+                    if ($continue_search_backward && $this->searchTokenInNegPrefixList($backward_token)) {
                         $found_negative_prefix = true;
                     }
                 }
 
                 //If we found a negative prefix for this token
                 if ($found_negative_prefix) {
-                    
                     //If there is an inverse class for the current one, we improve his score instead
                     if (isset($scores[$this->inverseClasses[$class]])) {
                         $scores[$this->inverseClasses[$class]] *= ($count + 1);
