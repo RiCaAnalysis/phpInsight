@@ -142,23 +142,46 @@ class Sentiment {
     /**
      * Search a token into the dictionary, supportingt wildcare
      *
-     * @param str $token
+     * @param str $token : The token to search for in dictionnary
+     * @param mixed $class : Default = false -> search for all class, else, the class to search for ('neu', 'neg', 'pos')
      * @return mixed : false if not found, else, the word
      */
-    public function searchTokenInDictionary($token) {
+    public function searchTokenInDictionary($token, $class = false) {
 
-        //Protect to conserve possible special chars
-        $token = str_replace('*', '([.*])', preg_quote($token, '#'));
-
+        $words = [];
+            
         //Get list of dictionary words
-        $dictionary_tokens = array_keys($this->dictionary);
+        if (!$class) {
+            $words = array_keys($this->dictionary);
+        } else {
+            foreach ($this->dictionary as $word => $wordClasses) {
+                if (isset($this->dictionary[$word][$class])) {
+                    $words[] = $word;
+                }
+            }
+        }
 
-        //Try to match using the regex for each word of dictionary
-        foreach ($dictionary_tokens as $dictionary_token) {
-            $matches = array();
+        //Try to match using str_pos and wildcare for each word of dictionary
+        foreach ($words as $word) {
 
-            if (preg_match('#^' . $token . '$#u', $dictionary_token, $matches) !== 0) {
-                return $matches[0];
+            //Search for a wildare
+            $wildcare = false;
+            if (mb_strpos($word, '*') !== false) {
+                $word_escape = str_replace('*', '', $word);
+                $wildcare = true;
+            }
+
+            //If wildcare, search for a string starting by
+            if ($wildcare) {
+                $stringPos = mb_strpos($token, $word_escape);
+                if ($stringPos !== false && $stringPos == 0) {
+                    return $word;
+                }
+            }
+
+            //if no wildcare, search for exact string
+            if ($word == $token) {
+                return $word;
             }
         }
 
@@ -174,14 +197,26 @@ class Sentiment {
      */
     public function searchTokenInNegPrefixList($token) {
 
-        //Protect to conserve possible special chars
-        $token = str_replace('*', '([.*])', preg_quote($token, '#'));
-
-        //Try to match using regex for each prefix of the list
+        //Try to match using str_pos and wildcare for each prefix of the list
         foreach ($this->negPrefixList as $negPrefix) {
-            $matches = array();
 
-            if (preg_match('#^' . $token . '$#u', $negPrefix, $matches) !== 0) {
+            //Search for wildcare
+            $wildcare = false;
+            if (mb_strpos($negPrefix, '*') !== false) {
+                $negPrefixEscape = str_replace('*', '', $negPrefix);
+                $wildcare = true;
+            }
+
+            //If wildcare, searching for a word starting by prefix
+            if ($wildcare) {
+                $strPos = mb_strpos($token, $negPrefixEscape);
+                if ($strPos !== false && $strPos == 0) {
+                    return true;
+                }
+            }
+
+            //If no wildcare, searching for exact match
+            if ($negPrefix == $token) {
                 return true;
             }
         }
@@ -216,13 +251,13 @@ class Sentiment {
 			//For each of the individual words used loop through to see if they match anything in the $dictionary
             foreach ($tokens as $token_key => $token) {
 
-				//If statement so to ignore tokens which are either too long or too short or in the $ignoreList
+                //If statement so to ignore tokens which are either too long or too short or in the $ignoreList
                 if (strlen($token) < $this->minTokenLength || strlen($token) > $this->maxTokenLength || in_array($token, $this->ignoreList)) {
                     continue;
                 }
 
                 //Search for current token in dictionaries
-                $token_found = $this->searchTokenInDictionary($token);
+                $token_found = $this->searchTokenInDictionary($token, $class);
 
                 //If there is not for the current class, pass to next token
                 if ($token_found === FALSE || !isset($this->dictionary[$token_found][$class])) {
@@ -250,20 +285,20 @@ class Sentiment {
                     //Set backward and forward tokens, if they exists
                     $forward_token = isset($tokens[$token_key + $i]) ? $tokens[$token_key + $i] : false;
                     $backward_token = isset($tokens[$token_key - $i]) ? $tokens[$token_key - $i] : false;
-                    
+
                     //If we reach end of the text, or find a split word after current token, or another meaningful token, then, stop looking forward
-                    if (!$forward_token || in_array($forward_token, $this->splitWordsList) || $this->searchTokenInDictionary($forward_token)) {
+                    if (!$forward_token || !$continue_search_forward || in_array($forward_token, $this->splitWordsList) || $this->searchTokenInDictionary($forward_token)) {
                         $continue_search_forward = false;
                     }
-
+                    
                     //If we reach begenning of the text, or find a split word before current token, or another meaningful token, then stop looking backward
-                    if (!$backward_token || in_array($backward_token, $this->splitWordsList) || $this->searchTokenInDictionary($backward_token)) {
+                    if (!$backward_token || !$continue_search_backward || in_array($backward_token, $this->splitWordsList) || $this->searchTokenInDictionary($backward_token)) {
                         $continue_search_backward = false;
                     }
 
                     //If we found a negative prefix in this part of the sentence, we can consider it as meaningful
             
-                    if ($this->searchTokenInNegPrefixList($forward_token)) {
+                    if ($continue_search_forward && $this->searchTokenInNegPrefixList($forward_token)) {
                         $found_negative_prefix = true;
                     
                         //For forward token only, take count of potential interogation mark after.
@@ -273,14 +308,13 @@ class Sentiment {
                         }
                     }
  
-                    if ($this->searchTokenInNegPrefixList($backward_token)) {
+                    if ($continue_search_backward && $this->searchTokenInNegPrefixList($backward_token)) {
                         $found_negative_prefix = true;
                     }
                 }
 
                 //If we found a negative prefix for this token
                 if ($found_negative_prefix) {
-                    
                     //If there is an inverse class for the current one, we improve his score instead
                     if (isset($scores[$this->inverseClasses[$class]])) {
                         $scores[$this->inverseClasses[$class]] *= ($count + 1);
@@ -325,8 +359,8 @@ class Sentiment {
 
 		$scores = $this->score($sentence);
 
-        //If all scores are equal return 'neu', wich reflect the most the truth
-        if (count(array_unique($scores)) === 1) {
+        //If no clear score, return 'neu'
+        if ($scores[array_keys($scores)[0]] == $scores[array_keys($scores)[1]]) {
             return 'neu';
         }
 
@@ -467,7 +501,7 @@ class Sentiment {
         }
 
 		//Break string into individual words using explode putting them into an array
-        $matches = explode(" ", $string);
+        $matches = mb_split("( |')", $string);
 
         //Remove empty strings from $matches and reindex
         $matches = array_values(array_filter($matches, function($value) { return !($value == ""); }));

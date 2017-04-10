@@ -1,3 +1,2 @@
 <?php 
-$neu = array(
-);
+$neu = array();

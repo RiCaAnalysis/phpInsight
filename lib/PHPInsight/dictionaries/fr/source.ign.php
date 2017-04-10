@@ -1,3 +1,2 @@
 <?php 
-$ign = array(
-);
+$ign = array();
