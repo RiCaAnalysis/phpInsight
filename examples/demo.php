@@ -4,27 +4,17 @@ if (PHP_SAPI != 'cli') {
 }
 
 $strings = array(
-	1 => 'Weather today is rubbish',
-	2 => 'This cake looks amazing',
-	3 => 'His skills are mediocre',
-	4 => 'He is very talented',
-	5 => 'She is seemingly very agressive',
-	6 => 'Marie was enthusiastic about the upcoming trip. Her brother was also passionate about her leaving - he would finally have the house for himself.',
-	7 => 'To be or not to be?',
-    8 => 'It\'s not a beautiful day today.',
-    9 => 'This day is not beautiful.',
-    10 => 'I think they lose not, for now at least.',
-    11 => 'She is beautiful not?',
-    12 => 'This guy :)',
-    13 => 'This guy :(',
-    14 => 'This is amazing for one reason: No side effects !', 
+	1 => 'La démocratie est en danger et Mme Le Pen et M. Fillon et Mélenchon expriment de la fascination envers M. Poutine qui arrête 700 opposants.',
+	2 => 'C\'est fou à quel point pratiquement toutes les personnes que je connaisse de près ou de loin soutiennent Mélenchon. C\'est assez réconfortant',
+	3 => 'Léon Bertrand c\'est notre Fillon régionale. Il vole l\'argent, et fait comme si de rien n\'était.',
+	4 => 'Bizarre que Fillon fasse tant confiance à "Bienvenue place Beauvau" alors qu\'il y est accusé d\'avoir activé le Cabinet noir contre Sarkozy', 
 );
 
 
 
 
 require_once __DIR__ . '/../autoload.php';
-$sentiment = new \PHPInsight\Sentiment();
+$sentiment = new \PHPInsight\Sentiment(false, "fr");
 foreach ($strings as $string) {
 
 	// calculations:
