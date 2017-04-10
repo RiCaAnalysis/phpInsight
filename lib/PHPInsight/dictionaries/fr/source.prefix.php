@@ -4,4 +4,6 @@ $prefix = array(
   'ne',
   'n',
   'non',
+  'sans',
+  'peu'
 );
