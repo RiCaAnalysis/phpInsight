@@ -1,5 +1,11 @@
 <?php
 $pos = array(
+    ':)',
+';)',
+':b',
+':d',
+'^^',
+'^_^',
     "abasourdi",
     "abondance",
     "abondante",
@@ -263,7 +269,7 @@ $pos = array(
     "compacte",
     "compassion",
     "compatible",
-    "competences",
+    "competent",
     "competitif",
     "complement",
     "complementaires",
