@@ -489,7 +489,7 @@ $pos = array(
     "euphorie",
     "euphorique",
     "evaluation",
-    "evocateur"
+    "evocateur",
     "exact",
     "exaltant",
     "exaltante",
@@ -534,7 +534,6 @@ $pos = array(
     "eyecatch",
     "fabuleusement",
     "fabuleux",
-    "facile"
     "facile",
     "facilement",
     "facilite",
@@ -1361,7 +1360,6 @@ $pos = array(
     "transparent",
     "travail",
     "travaille",
-    "tres"
     "tresor",
     "triomphalement",
     "triomphant",
