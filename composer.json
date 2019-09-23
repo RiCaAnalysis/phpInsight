@@ -1,5 +1,5 @@
 {
-    "name": "dmitry-udod/phpInsight",
+    "name": "dmitry-udod/php-insight",
     "type": "library",
     "description": "Sentiment analysis tool for PHP",
     "keywords": [
