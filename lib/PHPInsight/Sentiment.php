@@ -311,7 +311,7 @@ class Sentiment
      * @param string $type
      * @return array
      */
-    public function getList($type)
+    public function getList(string $type)
     {
         //Set up empty word list array
         $wordList = $words = [];
@@ -321,7 +321,7 @@ class Sentiment
             $temp = file_get_contents($fn);
             $words = unserialize($temp);
         } else {
-            echo 'File does not exist: ' . $fn;
+            return [];
         }
 
         //Loop through results
@@ -382,7 +382,8 @@ class Sentiment
      */
     public function reloadDictionaries()
     {
-        $filePrefixes = ['prefix'] + $this->classes;
+        $filePrefixes = array_merge(['prefix', 'ign'], $this->classes);
+
         foreach ($filePrefixes as $class) {
             $fn = "{$this->dataFolder}data.{$class}.php";
             if (file_exists($fn)) {
