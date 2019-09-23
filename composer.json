@@ -8,7 +8,7 @@
         "Sentiment analysis",
         "php"
     ],
-    "homepage": "https://github.com/dmitry-udod/phpInsight",
+    "homepage": "https://github.com/dmitry-udod/php-insight",
     "license": "GPLv3 or later",
     "minimum-stability": "dev",
     "require": {

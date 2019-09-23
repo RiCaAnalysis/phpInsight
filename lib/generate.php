@@ -1,6 +1,7 @@
 <?php
 
-require_once __DIR__ . './../vendor/autoload.php';
+require_once "PHPInsight/Sentiment.php";
+require_once "PHPInsight/Autoloader.php";
 
 echo "Generate dictionaries\n";
 (new PHPInsight\Sentiment())->reloadDictionaries();
