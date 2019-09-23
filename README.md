@@ -1,9 +1,9 @@
-phpInsight - Sentiment Analysis in PHP
+php-insight - Sentiment Analysis in PHP
 ---------
 
 ### Installation
 ```bash
-composer reqiure dmitry-udod/phpInsight
+composer require dmitry-udod/php-insight
 ```
 
 ### Usage
