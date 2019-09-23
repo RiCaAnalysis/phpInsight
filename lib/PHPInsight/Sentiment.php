@@ -2,28 +2,6 @@
 
 namespace PHPInsight;
 
-/*
-  phpInsight is a Naive Bayes classifier to calculate sentiment. The program
-  uses a database of words categorised as positive, negative or neutral
-
-  Copyright (C) 2012  James Hennessey
-  Class modifications and improvements by Ismayil Khayredinov (ismayil.khayredinov@gmail.com)
-
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>
-
- */
-
 class Sentiment
 {
     /**
@@ -128,9 +106,9 @@ class Sentiment
      * Get scores for each class
      *
      * @param string $sentence Text to analyze
-     * @return int Score
+     * @return array Score
      */
-    public function score($sentence)
+    public function score($sentence): array
     {
         //For each negative prefix in the list
         foreach ($this->negPrefixList as $negPrefix) {
@@ -253,7 +231,7 @@ class Sentiment
      * @param string $dataFolder base folder
      * @param bool $loadDefaults true - load everything by default | false - just change the directory
      */
-    public function setDataFolder($dataFolder = false, $loadDefaults = false)
+    public function setDataFolder($dataFolder, $loadDefaults = false)
     {
         //if $dataFolder not provided, load default, else set the provided one
         if (! $dataFolder) {
@@ -338,12 +316,12 @@ class Sentiment
         //Set up empty word list array
         $wordList = [];
 
-        $fn = "{$this->dataFolder}data.{$type}.php";;
+        $fn = "{$this->dataFolder}data.{$type}.php";
         if (file_exists($fn)) {
             $temp = file_get_contents($fn);
             $words = unserialize($temp);
         } else {
-            return 'File does not exist: ' . $fn;
+            echo 'File does not exist: ' . $fn;
         }
 
         //Loop through results
@@ -364,7 +342,7 @@ class Sentiment
      * Function to clean a string so all characters with accents are turned into ASCII characters. EG: ‡ = a
      *
      * @param string $string
-     * @return str
+     * @return string
      */
     private function _cleanString($string)
     {
