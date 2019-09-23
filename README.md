@@ -14,6 +14,7 @@ $analyzer = new Sentiment();
 $analyzer->categorise($string); #return text category, positive, negative or neutral
 $scores = $analyzer->score($string);
 /**
+
 Returns text scores, for example
 (
     [neg] => 0.865
@@ -37,4 +38,4 @@ composer generate-dictionaries
 ```
 
 ### Tests
-Install and run phpunit in current dir
+Install and run phpunit in project dir
