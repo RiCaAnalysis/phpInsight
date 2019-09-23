@@ -9,7 +9,7 @@ composer reqiure dmitry-udod/phpInsight
 ### Usage
 ```php
 use PHPInsight\Sentiment;
-....
+#....
 $analyzer = new Sentiment();
 $analyzer->categorise($string); #return text category, positive, negative or neutral
 $scores = $analyzer->score($string);
