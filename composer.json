@@ -19,6 +19,11 @@
             "PHPInsight\\": "lib/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
     "config": {
         "optimize-autoloader": true
     },

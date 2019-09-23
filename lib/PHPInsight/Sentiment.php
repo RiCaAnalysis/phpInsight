@@ -115,9 +115,8 @@ class Sentiment
      * @param string $dataFolder base folder
      * Sets defaults and loads/caches dictionaries
      */
-    public function __construct($dataFolder = false)
+    public function __construct($dataFolder = null)
     {
-
         //set the base folder for the data models
         $this->setDataFolder($dataFolder);
 
@@ -135,7 +134,6 @@ class Sentiment
     {
         //For each negative prefix in the list
         foreach ($this->negPrefixList as $negPrefix) {
-
             //Search if that prefix is in the document
             if (strpos($sentence, $negPrefix) !== false) {
                 //Remove the white space after the negative prefix
@@ -143,11 +141,11 @@ class Sentiment
             }
         }
 
-        //Tokenise Document
+        //Tokenize Document
         $tokens = $this->_getTokens($sentence);
         // calculate the score in each category
 
-        $total_score = 0;
+        $totalScore = 0;
 
         //Empty array for the scores for each of the possible categories
         $scores = [];
@@ -155,7 +153,7 @@ class Sentiment
         //Loop through all of the different classes set in the $classes variable
         foreach ($this->classes as $class) {
 
-            //In the scores array add another dimention for the class and set it's value to 1. EG $scores->neg->1
+            //In the scores array add another dimension for the class and set it's value to 1. EG $scores->neg->1
             $scores[$class] = 1;
 
             //For each of the individual words used loop through to see if they match anything in the $dictionary
@@ -182,11 +180,11 @@ class Sentiment
 
         //Makes the scores relative percents
         foreach ($this->classes as $class) {
-            $total_score += $scores[$class];
+            $totalScore += $scores[$class];
         }
 
         foreach ($this->classes as $class) {
-            $scores[$class] = round($scores[$class] / $total_score, 3);
+            $scores[$class] = round($scores[$class] / $totalScore, 3);
         }
 
         //Sort array in reverse order
@@ -258,7 +256,7 @@ class Sentiment
     public function setDataFolder($dataFolder = false, $loadDefaults = false)
     {
         //if $dataFolder not provided, load default, else set the provided one
-        if ($dataFolder == false) {
+        if (! $dataFolder) {
             $this->dataFolder = __DIR__ . '/data/';
         } else {
             if (file_exists($dataFolder)) {
