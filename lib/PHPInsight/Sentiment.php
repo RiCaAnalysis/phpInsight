@@ -120,7 +120,7 @@ class Sentiment
         }
 
         //Tokenize Document
-        $tokens = $this->_getTokens($sentence);
+        $tokens = $this->getTokens($sentence);
         // calculate the score in each category
 
         $totalScore = 0;
@@ -285,14 +285,14 @@ class Sentiment
      * @param string $string String being broken up
      * @return array An array of tokens
      */
-    private function _getTokens($string)
+    private function getTokens($string)
     {
 
         // Replace line endings with spaces
         $string = str_replace("\r\n", " ", $string);
 
         //Clean the string so is free from accents
-        $string = $this->_cleanString($string);
+        $string = $this->cleanString($string);
 
         //Make all texts lowercase as the database of words in in lowercase
         $string = strtolower($string);
@@ -314,7 +314,7 @@ class Sentiment
     public function getList($type)
     {
         //Set up empty word list array
-        $wordList = [];
+        $wordList = $words = [];
 
         $fn = "{$this->dataFolder}data.{$type}.php";
         if (file_exists($fn)) {
@@ -344,7 +344,7 @@ class Sentiment
      * @param string $string
      * @return string
      */
-    private function _cleanString($string)
+    private function cleanString($string)
     {
 
         $diac =
