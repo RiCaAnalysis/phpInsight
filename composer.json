@@ -16,8 +16,26 @@
     },
     "autoload": {
         "psr-4": {
-            "PHPInsight": "lib/"
+            "PHPInsight\\": "lib/"
         }
-    }
+    },
+    "config": {
+        "optimize-autoloader": true
+    },
+    "scripts": {
+        "generate-dictionaries": [
+            "php lib/generate.php"
+        ],
+        "demo": [
+            "php examples/demo.php"
+        ],
+        "post-install-cmd": [
+            "php lib/generate.php"
+        ],
+        "post-update-cmd": [
+            "php lib/generate.php"
+        ]
+    },
+    "prefer-stable": true
 }
 

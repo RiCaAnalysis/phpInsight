@@ -23,11 +23,11 @@ namespace PHPInsight;
 
  */
 
-class Sentiment {
-
+class Sentiment
+{
 	/**
 	 * Location of the dictionary files
-	 * @var str 
+	 * @var string
 	 */
 	private $dataFolder = '';
 
@@ -35,19 +35,19 @@ class Sentiment {
 	 * List of tokens to ignore
 	 * @var array 
 	 */
-	private $ignoreList = array();
+	private $ignoreList = [];
 
 	/**
 	 * List of words with negative prefixes, e.g. isn't, arent't
 	 * @var array
 	 */
-	private $negPrefixList = array();
+	private $negPrefixList = [];
 
 	/**
 	 * Storage of cached dictionaries
 	 * @var array 
 	 */
-	private $dictionary = array();
+	private $dictionary = [];
 
 	/**
 	 * Min length of a token for it to be taken into consideration
@@ -111,10 +111,11 @@ class Sentiment {
 
 	/**
 	 * Class constructor
-	 * @param str $dataFolder base folder
+	 * @param string $dataFolder base folder
 	 * Sets defaults and loads/caches dictionaries
 	 */
-	public function __construct($dataFolder = false) {
+	public function __construct($dataFolder = false)
+    {
 
 		//set the base folder for the data models
 		$this->setDataFolder($dataFolder);
@@ -126,17 +127,16 @@ class Sentiment {
 	/**
 	 * Get scores for each class
 	 *
-	 * @param str $sentence Text to analyze
+	 * @param string $sentence Text to analyze
 	 * @return int Score
 	 */
 	public function score($sentence) {
-
 		//For each negative prefix in the list
 		foreach ($this->negPrefixList as $negPrefix) {
 
 			//Search if that prefix is in the document
 			if (strpos($sentence, $negPrefix) !== false) {
-				//Reove the white space after the negative prefix
+				//Remove the white space after the negative prefix
 				$sentence = str_replace($negPrefix . ' ', $negPrefix, $sentence);
 			}
 		}
@@ -148,7 +148,7 @@ class Sentiment {
 		$total_score = 0;
 
 		//Empty array for the scores for each of the possible categories
-		$scores = array();
+		$scores = [];
 
 		//Loop through all of the different classes set in the $classes variable
 		foreach ($this->classes as $class) {
@@ -160,7 +160,7 @@ class Sentiment {
 			foreach ($tokens as $token) {
 
 				//If statement so to ignore tokens which are either too long or too short or in the $ignoreList
-				if (strlen($token) > $this->minTokenLength && strlen($token) < $this->maxTokenLength && !in_array($token, $this->ignoreList)) {
+				if (strlen($token) > $this->minTokenLength && strlen($token) < $this->maxTokenLength && ! $this->inIgnoreList($token)) {
 					//If dictionary[token][class] is set
 					if (isset($this->dictionary[$token][$class])) {
 						//Set count equal to it
@@ -196,8 +196,8 @@ class Sentiment {
 	/**
 	 * Get the class of the text based on it's score
 	 * 
-	 * @param str $sentence
-	 * @return str pos|neu|neg
+	 * @param string $sentence
+	 * @return string pos|neu|neg
 	 */
 	public function categorise($sentence) {
 
@@ -212,48 +212,44 @@ class Sentiment {
 	/**
 	 * Load and cache dictionary
 	 *
-	 * @param str $class
+	 * @param string $class
 	 * @return boolean
 	 */
-	public function setDictionary($class) {
+	public function setDictionary($class)
+	{
 		/**
 		 *  For some people this file extention causes some problems!
 		 */
+        $words = [];
 		$fn = "{$this->dataFolder}data.{$class}.php";
 
 		if (file_exists($fn)) {
 			$temp = file_get_contents($fn);
 			$words = unserialize($temp);
 		} else {
-			echo 'File does not exist: ' . $fn;
+			echo "Generate new dictionaries $fn \n";
 		}
 
 		//Loop through all of the entries
 		foreach ($words as $word) {
-
 			$this->docCount++;
 			$this->classDocCounts[$class]++;
-
-			//Trim word
 			$word = trim($word);
 
-			//If this word isn't already in the dictionary with this class
 			if (!isset($this->dictionary[$word][$class])) {
-
-				//Add to this word to the dictionary and set counter value as one. This function ensures that if a word is in the text file more than once it still is only accounted for one in the array
 				$this->dictionary[$word][$class] = 1;
-			}//Close If statement
+			}
 
 			$this->classTokCounts[$class]++;
 			$this->tokCount++;
-		}//Close while loop going through everyline in the text file
+		}
 
 		return true;
 	}
 
 	/**
 	 * Set the base folder for loading data models
-	 * @param str  $dataFolder base folder
+	 * @param string  $dataFolder base folder
 	 * @param bool $loadDefaults true - load everything by default | false - just change the directory
 	 */
 	public function setDataFolder($dataFolder = false, $loadDefaults = false){
@@ -279,7 +275,8 @@ class Sentiment {
 	/**
 	 * Load and cache directories, get ignore and prefix lists
 	 */
-	private function loadDefaults(){
+	private function loadDefaults()
+	{
 		// Load and cache dictionaries
 		foreach ($this->classes as $class) {
 			if (!$this->setDictionary($class)) {
@@ -287,28 +284,27 @@ class Sentiment {
 			}
 		}
 
-		if (!isset($this->dictionary) || empty($this->dictionary))
-			echo 'Error: Dictionaries not set';
-
 		//Run function to get ignore list
 		$this->ignoreList = $this->getList('ign');
 
 		//If ingnoreList not get give error message
-		if (!isset($this->ignoreList))
+		if (!isset($this->ignoreList)) {
 			echo 'Error: Ignore List not set';
+		}
 
 		//Get the list of negative prefixes
 		$this->negPrefixList = $this->getList('prefix');
 
 		//If neg prefix list not set give error
-		if (!isset($this->negPrefixList))
+		if (!isset($this->negPrefixList)) {
 			echo 'Error: Ignore List not set';
+		}
 	}
 
 	/**
 	 * Break text into tokens
 	 *
-	 * @param str $string	String being broken up
+	 * @param string $string	String being broken up
 	 * @return array An array of tokens
 	 */
 	private function _getTokens($string) {
@@ -333,12 +329,12 @@ class Sentiment {
 	/**
 	 * Load and cache additional word lists
 	 *
-	 * @param str $type
+	 * @param string $type
 	 * @return array
 	 */
 	public function getList($type) {
 		//Set up empty word list array
-		$wordList = array();
+		$wordList = [];
 
 		$fn = "{$this->dataFolder}data.{$type}.php";
 		;
@@ -366,7 +362,7 @@ class Sentiment {
 	/**
 	 * Function to clean a string so all characters with accents are turned into ASCII characters. EG: ‡ = a
 	 * 
-	 * @param str $string
+	 * @param string $string
 	 * @return str
 	 */
 	private function _cleanString($string) {
@@ -392,9 +388,10 @@ class Sentiment {
 	 * Deletes old data/data.* files
 	 * Creates new files from updated source fi
 	 */
-	public function reloadDictionaries(){
-
-		foreach($this->classes as $class){
+	public function reloadDictionaries()
+	{
+		$filePrefixes = ['prefix'] + $this->classes;
+		foreach($filePrefixes as $class){
 			$fn = "{$this->dataFolder}data.{$class}.php";
 			if (file_exists($fn)) {
 				unlink($fn);
@@ -402,22 +399,29 @@ class Sentiment {
 		}
 
 		$dictionaries = __DIR__ . '/dictionaries/';
-
-		foreach($this->classes as $class){
+		foreach($filePrefixes as $class){
 			$dict = "{$dictionaries}source.{$class}.php";
 
 			require_once($dict);
 
 			$data = $class;
-
 			$fn = "{$this->dataFolder}data.{$class}.php";
 			file_put_contents($fn, serialize($$data));
 		}
-
-		
-
 	}
 
-}
+	/**
+	 * Check that token exists in ignore list
+	 *
+	 * @param $token
+	 * @return bool
+	 */
+	private function inIgnoreList($token): bool
+	{
+		if (! is_array($token) || empty ($this->ignoreList)) {
+			return false;
+		}
 
-?>
+		return in_array($token, $this->ignoreList);
+	}
+}
