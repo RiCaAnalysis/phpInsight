@@ -177,7 +177,7 @@ class Sentiment
      * @param string $sentence
      * @return string pos|neu|neg
      */
-    public function categorise($sentence)
+    public function categorise($sentence): string
     {
 
         $scores = $this->score($sentence);
@@ -285,9 +285,8 @@ class Sentiment
      * @param string $string String being broken up
      * @return array An array of tokens
      */
-    private function getTokens($string)
+    private function getTokens($string): array
     {
-
         // Replace line endings with spaces
         $string = str_replace("\r\n", " ", $string);
 
@@ -311,7 +310,7 @@ class Sentiment
      * @param string $type
      * @return array
      */
-    public function getList(string $type)
+    public function getList(string $type): array
     {
         //Set up empty word list array
         $wordList = $words = [];
@@ -344,7 +343,7 @@ class Sentiment
      * @param string $string
      * @return string
      */
-    private function cleanString($string)
+    private function cleanString($string): string
     {
 
         $diac =
