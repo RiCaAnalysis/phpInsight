@@ -32,7 +32,7 @@
             "php lib/generate.php"
         ],
         "demo": [
-            "php examples/demo.php"
+            "php examples/demo_pt.php"
         ],
         "post-install-cmd": [
             "php lib/generate.php"
