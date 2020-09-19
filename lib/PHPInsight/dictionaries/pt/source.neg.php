@@ -1919,7 +1919,7 @@ $neg = array(
   "cerca",
   "hedonista",
   "desatento",
-  “hegemonismo”,
+  "hegemonismo",
   "hegemonista",
   "hegemonia",
   "hediondo",

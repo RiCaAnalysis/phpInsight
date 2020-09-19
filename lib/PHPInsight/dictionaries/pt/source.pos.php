@@ -482,7 +482,7 @@ $pos = array(
     "esperança",
     "mente",
     "estrondo",
-    "falta de ar"
+    "falta de ar",
     "estabelecido",
     "eterno",
     "ética",
