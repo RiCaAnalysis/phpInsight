@@ -1,0 +1,2 @@
+<?php 
+$ign = array();
