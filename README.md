@@ -3,7 +3,7 @@ php-insight - Sentiment Analysis in PHP
 
 ### Installation
 ```bash
-composer require dmitry-udod/php-insight
+composer require ricasolucoes/php-insight
 ```
 
 ### Usage
