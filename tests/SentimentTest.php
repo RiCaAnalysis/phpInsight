@@ -35,7 +35,9 @@ class SentimentTest extends TestCase
         ['category' => 'neg', 'neg' => 0.865, 'neu' => 0.108, 'pos' => 0.027,],
     ];
 
-    /** @test */
+    /**
+     * @test 
+     */
     public function analyze_sentiment()
     {
         $analyzer = new Sentiment();
