@@ -146,7 +146,8 @@ class Sentiment
      *
      * @param str $token : The token to search for in dictionnary
      * @param mixed $class : Default = false -> search for all class, else, the class to search for ('neu', 'neg', 'pos')
-     * @return mixed : false if not found, else, the word
+     *
+     * @return array-key|false if not found, else, the word
      */
     public function searchTokenInDictionary($token, $class = false)
     {
@@ -164,6 +165,7 @@ class Sentiment
         }
 
         //Try to match using str_pos and wildcare for each word of dictionary
+        $word_escape = null;
         foreach ($words as $word) {
 
             //Search for a wildare
@@ -195,12 +197,14 @@ class Sentiment
      * Search a token into the negPrefixList
      *
      * @param str $token
-     * @return boolean : true if found, false else
+     *
+     * @return bool if found, false else
      */
-    public function searchTokenInNegPrefixList($token)
+    public function searchTokenInNegPrefixList($token): bool
     {
 
         //Try to match using str_pos and wildcare for each prefix of the list
+        $negPrefixEscape = null;
         foreach ($this->negPrefixList as $negPrefix) {
 
             //Search for wildcare
@@ -231,9 +235,12 @@ class Sentiment
      * Get scores for each class
      *
      * @param str $sentence Text to analyze
-     * @return int Score
+     *
+     * @return (float|int|mixed)[] Score
+     *
+     * @psalm-return array<array-key, float|int|mixed>
      */
-    public function score($sentence)
+    public function score($sentence): array
     {
         //Tokenise Document
         $tokens = $this->_getTokens($sentence);
@@ -356,7 +363,8 @@ class Sentiment
      * Get the class of the text based on it's score
      *
      * @param str $sentence
-     * @return str pos|neu|neg
+     *
+     * @return array-key|null pos|neu|neg
      */
     public function categorise($sentence)
     {
@@ -377,15 +385,17 @@ class Sentiment
      * Load and cache dictionary
      *
      * @param str $class
-     * @return boolean
+     *
+     * @return true
      */
-    public function setDictionary($class)
+    public function setDictionary($class): bool
     {
         /**
          *  For some people this file extention causes some problems!
          */
         $fn = "{$this->dataFolder}data.{$class}.php";
 
+        $words = null;
         if (file_exists($fn)) {
             $temp = file_get_contents($fn);
             $words = unserialize($temp);
@@ -417,10 +427,13 @@ class Sentiment
 
     /**
      * Set the base folder for loading data models
+     *
      * @param str  $dataFolder base folder
      * @param bool $loadDefaults true - load everything by default | false - just change the directory
+     *
+     * @return void
      */
-    public function setDataFolder($dataFolder = false, $lang = 'en', $loadDefaults = false)
+    public function setDataFolder($dataFolder = false, $lang = 'en', $loadDefaults = false): void
     {
         //if $dataFolder not provided, load default, else set the provided one
         if ($dataFolder == false) {
@@ -445,8 +458,10 @@ class Sentiment
 
     /**
      * Load and cache directories, get ignore and prefix lists
+     *
+     * @return void
      */
-    private function loadDefaults()
+    private function loadDefaults(): void
     {
         // Load and cache dictionaries
         foreach ($this->classes as $class) {
@@ -488,9 +503,12 @@ class Sentiment
      * Break text into tokens
      *
      * @param str $string	String being broken up
-     * @return array An array of tokens
+     *
+     * @return string[] An array of tokens
+     *
+     * @psalm-return list<string>
      */
-    private function _getTokens($string)
+    private function _getTokens($string): array
     {
 
         // Replace line endings with spaces
@@ -523,7 +541,10 @@ class Sentiment
      * Load and cache additional word lists
      *
      * @param str $type
-     * @return array
+     *
+     * @return string|string[]
+     *
+     * @psalm-return list<string>|string
      */
     public function getList($type)
     {
@@ -557,7 +578,8 @@ class Sentiment
      * Function to clean a string so all characters with accents are turned into ASCII characters. EG: ‡ = a
      *
      * @param str $string
-     * @return str
+     *
+     * @return false|string
      */
     private function _cleanString($string)
     {

@@ -1,2 +1,1 @@
 <?php 
-$neu = array();
