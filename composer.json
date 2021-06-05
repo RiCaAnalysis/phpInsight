@@ -41,6 +41,8 @@
             "php lib/PHPInsight/data/generate.php"
         ]
     },
-    "prefer-stable": true
+    "prefer-stable": true,
+    "require-dev": {
+        "phpro/grumphp": "^1.3"
+    }
 }
-
